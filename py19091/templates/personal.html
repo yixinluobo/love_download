@@ -1,0 +1,30 @@
+{% extends "template.html" %}
+{% block title %}个人信息{% endblock %}
+{% load extra_filters %}
+{% block main %}
+    <div id="main">
+        <div class="personal">
+            <div class="lf">
+                <img src="/photo" alt="用户头像"/>
+            </div>
+
+            <div class="rf">
+                <div>
+                    <span>{{ nickname }}</span>
+                    <span>
+						<b>{{ realname }}</b> |
+                        <b>{{ sex|sex }}</b>
+                        |  <b>{{ birth|date:"Y-m-d" }}</b>
+						<b><a href="/user/modifypass">修改密码</a></b>
+					</span>
+                </div>
+
+                <div>
+                    <span><b>{{ point }}</b>积分</span>
+                    <span><b>0</b>关注</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

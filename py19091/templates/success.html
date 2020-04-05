@@ -1,0 +1,36 @@
+{% extends 'template.html' %}
+{% block title %}注册完成{% endblock %}
+{% block main %}
+    <div id="main">
+        <!-- 上传表单-->
+        <div class="upload reg2">
+
+			<!-- 注册步骤导航-->
+			<div class="reg_step">
+				<a class="step1" href="/register">注册信息</a><a class="step1" href="/next_base">基本信息</a><a class="step" href="/success">注册完成</a>
+			</div>
+            <hr />
+
+			<p style="text-align:center">
+				<b>欢迎{{ nick_name }}注册成功、您是本系统第{{ user_id }}位用户~</b><br/>
+                <a href="/">系统<b id="time">5</b>s后会自动跳转到首页，如不能自动跳转，请点击跳转到首页</a>
+			</p>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $(function () {
+            let time = 5;
+            let myInter = setInterval(function () {
+                time--;
+                $("#time").text(time);
+                if(time<=0){
+                    window.location.href="/";
+                }
+            },1000);
+        })
+    </script>
+{% endblock %}

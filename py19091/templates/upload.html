@@ -1,0 +1,128 @@
+{% extends 'template.html' %}
+{% block title %}上传{% endblock %}
+{% block main %}
+    <div id="main">
+        <!-- 上传表单-->
+        <div class="upload">
+            <p>上传资源</p>
+            <hr/>
+            <form action="/res/upload" method="post" id="myform" enctype="multipart/form-data">
+                {% csrf_token %}
+                <span>
+                    <label>选择文件：</label>
+                    <input class="upt" type="text" readonly="readonly"/>
+                    <input id="file" class="upt" type="file" name="re_path" value=""/>
+                    <b></b>
+                    <b>文件格式可以是txt、pdf、zip、rar等后缀</b>
+                </span>
+                <span>
+                    <label>资源名称：</label>
+                    <input id="re_name" class="upt" type="text" name="re_name" value=""/>
+                </span>
+                <span>
+                    <label>资源类型：</label>
+                    <select class="upt" name="re_type" id="re_type">
+                        <option value="1">文本文件</option>
+                        <option value="2">电子文件</option>
+                        <option value="3">压缩文件</option>
+                        <option value="4">其他文件</option>
+                    </select>
+                </span>
+                <span>
+                    <label>关键词：</label>
+                    <input id="keywords" class="upt" type="text" name="key_words" value="" onchange="check(this)"/>
+                    <b></b>
+                    <b>多个关键词用空格分割,关键词不能超过5个</b>
+                </span>
+                <span>
+                    <label>资源分：</label>
+                    <select class="upt" id="sel" name="re_point">
+                        <option selected="selected">0</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                    </select>
+                </span>
+                <span class="d_span">
+                    <label>资源描述：</label>
+                    <input type="textarea" name="re_desc" class="area" value=""
+                           placeholder="描述不支持HTML标签；详细的资源描述有机会获得我们的推荐，更有利于他人下载，赚取更多积分。如资源描述不清，有可能审核不通过。">
+                </span>
+                <span>
+                    <label class="agree">
+                        <input id="choose" type="checkbox" value="1"/>
+                        <a href="#">同意爱下下资源上传协议</a>
+                    </label>
+
+                </span>
+
+                <span><label class="btn"><input id="reg" type="button" value="提交"/></label></span>
+            </form>
+        </div>
+        <!-- 公告 -->
+        <div class="advice">
+            <p class="title">上传须知</p>
+            <hr/>
+            <p><span>*</span>如涉及侵权内容,您的资源将被移除</p>
+            <p><span>*</span>请勿上传小说、mp3、图片等与技术无关的内容.一旦发现将被删除</p>
+            <p><span>*</span>请勿在未经授权的情况下上传任何涉及著作权侵权的资源，除非该资源完全由您个人创作</p>
+            <p><span>*</span>点击上传资源即表示您确认该资源不违反资源分享的使用条款，并且您拥有该资源的所有版权或者上传资源的授权</p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $(function () {
+            $("#file").change(function () {
+                let file = $("#file")[0].files[0];
+                let name = file.name;
+                let size = file.size;
+                let type = file.type;
+                console.log(file, name, size, type);
+                if (type != "text/plain" && type != "application/pdf" && type != "application/zip" && type != "application/rar") {
+                    $("#file").next().text("文件格式不正确！");
+                    return false;
+                }
+                $($(".upt")[0]).val(name);
+                {#自动填充文件名#}
+                new_name = name.substring(0, name.lastIndexOf("."));
+                $("#re_name").val(new_name);
+                {#自动选择资源类型#}
+                suffix = name.substring(name.lastIndexOf(".")+1);
+                if(suffix=='txt'){
+                    $("#re_type").val("1")
+                }else if(suffix=="pdf"){
+                    $("#re_type").val("2")
+                }else if(suffix=="zip"||suffix=="rar"||suffix=="7Z"){
+                    $("#re_type").val("3")
+                }else{
+                    $("#re_type").val("4")
+                }
+            });
+            $("#keywords").blur(function () {
+                let keywords = $("#keywords").val();
+                let myre = new RegExp("[ ]+");
+                let key_list = keywords.split(myre);
+                {#console.log(key_list)#}
+                if (key_list.length > 5) {
+                    $("#keywords").next().text("关键字超过5个！")
+                    return false;
+                }
+            });
+
+            $("#reg").click(function () {
+                if ($("#choose").is(":checked") && $($(".upt")[0]).val()) {
+                    $("#myform").submit();
+                }
+            })
+        })
+    </script>
+{% endblock %}

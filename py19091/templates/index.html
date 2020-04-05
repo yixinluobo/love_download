@@ -1,0 +1,147 @@
+{% extends 'template.html' %}
+{% block title %}首页{% endblock %}
+{#login弹出层#}
+{% block login %}
+    <div class="cvs" {% if msg is None %}style="display:none"{% endif %} id="cvs2_logon">
+        <div class="newModWin">
+            <div class="title">登录爱下下账号</div>
+            <div class="close" id="cvs2_close" onclick="close_win()">X</div>
+
+            <div class="logWin">
+                <form action="/login" method="post">
+{#                    {% csrf_token %}#}
+                    <input type="hidden" name="url" value="{{ request.GET.url }}">
+                    <input type="text" class="inp user" name="tel" autocomplete="off" placeholder="请输入用户名"
+                           value="{{ tel }}"/>
+                    <input type="password" class="inp pass" name="password" autocomplete="off" placeholder="请输入密码"/>
+                    <b>{{ msg|default:"" }}</b>
+                    <a href="/user/find_password" class="find_pass">忘记密码，立即找回</a>
+                    <input type="submit" class="su_btn" value="登录"/>
+                    <a href="/register" class="reg">注册</a>
+                    <p class="third">
+                        <a href="/third/zfb" class="zfb"><span>支付宝</span></a>
+                        <a class="wx"><span>微信</span></a>
+                        <a class="qq"><span>QQ</span></a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{#主体#}
+{% block main %}
+
+    <div id="nav">
+        <div id="search">
+            <input type="text" name="name" autocomplete="off"/><a class="search btn">搜索</a>
+        </div>
+
+        <div id="logon">
+            <div class="cons">
+                欢迎光临爱下下！
+            </div>
+            <div class="opers">
+                <a class="btn" href="/res/upload">上传资料</a>
+            </div>
+        </div>
+
+        <div id="login">
+            {% if request.session.LOGIN_LOCAL_FLAG %}
+                <img src="/photo" alt="">
+            {% else %}
+                <a href="javascript:void(0)" onclick="showWin()">点击登录</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="main">
+        <!-- 定义一个条目-->
+        {% for resource in re_list %}
+        <div class="pro">
+            <div class="img">
+                <img src="static/images/{{ resource.re_suffix }}.svg"/>
+            </div>
+            <div class="cs">
+                <div class="up">
+                    <a href="/res/detail/{{ resource.id }}">{{ resource.re_name }}</a>
+                </div>
+                <div class="down">
+                    上传者：{{ resource.nickname }} 上传时间：{{ resource.upload_time|date:"Y-m-d" }}
+                </div>
+            </div>
+            <div class="arr">
+                积分：<span>{{ resource.re_point }}</span>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="panigation">
+            <a href="/">首页</a>
+            {% if re_list.has_previous %}
+                <a href="/?page={{ re_list.previous_page_number }}">&lt;上一页</a>
+            {% else %}
+                <a href="javascript:void(0)">&lt;上一页</a>
+            {% endif %}
+            {% if re_list.has_next %}
+                <a href="/?page={{ re_list.next_page_number }}">下一页&gt;</a>
+            {% else %}
+                <a href="javascript:void(0)">下一页&gt;</a>
+            {% endif %}
+            <a href="/?page={{ re_list.paginator.num_pages }}">尾页</a>
+        </div>
+    </div>
+{% endblock %}
+{#js代码块#}
+{% block script %}
+    <script>
+        function showWin() {
+            $("#cvs2_logon").show()
+        }
+
+        function close_win() {
+            $("#cvs2_logon").hide()
+        }
+
+        $(function () {
+            $(document).keyup(function (event) {
+                {#console.log(event.keyCode)#}
+                if (event.keyCode == 27) {
+                    $("#cvs2_logon").hide()
+                }
+            });
+            {# 处理分页点击 #}
+            let num_re = new RegExp(/^\d+$/);
+            $(".panigation a").click(function () {
+                if($(".panigation a").hasClass("act")){
+                    $(".panigation a").removeClass("act")
+                }
+                if(num_re.test($(this).text())){
+                    $(this).addClass("act");
+                }
+                {# ajax请求 #}
+                let page = $(this).text();
+                {#console.log(page);#}
+                let url="";
+                let count = $(".act").text();
+                if(page=="1"){
+                    url = "/index"
+                }else if(page=="上一页"){
+
+                }else if(page=="下一页"){
+                    
+                }else {
+                    url = "/page/"+page
+                }
+                $.ajax({
+                    url:url,
+                    method: "GET",
+                    dataType: 'json',
+                    success: function (data) {
+                        
+                    }
+                })
+            });
+        })
+    </script>
+{% endblock %}

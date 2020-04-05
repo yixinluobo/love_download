@@ -1,0 +1,72 @@
+{% extends 'template.html' %}
+{% block title %}绑定账号{% endblock %}
+{% block main %}
+    <div id="main">
+        <!-- 上传表单-->
+        <div class="upload reg2">
+
+            <form action="/third/zfb_bind" autocomplete="off" id="myform" method="post">
+                <input type="hidden" name="alipay_user_id" value="{{ alipay_user_id }}">
+                <input type="hidden" name="qq_user_id" value="{{ qq_user_id }}">
+                <input type="hidden" name="wx_user_id" value="{{ wx_user_id }}">
+                <span>
+                    <label>手机号：</label>
+                    <input id="tel" class="upt" type="text" name="tel" value="{{ tel }}"/>
+					<b></b>
+                    <b>{{ msg }}</b>
+                </span>
+                <span>
+                    <label>密码：</label>
+                    <input id="password" class="upt" type="password" name="password" value=""/>
+                    <b></b>
+                    <b>密码长度为6-20位</b>
+                </span>
+                <span>
+                    <input type="button" id="mysubmit" value="确认绑定">
+                </span>
+                <span>
+                    <a href="/third/register?alipay_user_id={{ alipay_user_id }}&qq_user_id={{ qq_user_id }}&wx_user_id={{ wx_user_id }}">还没有账号，去注册...</a>
+                </span>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+<script>
+    $(function () {
+        $("#mysubmit").click(function () {
+            if($("#tel").val()){
+                let tel = $("#tel").val();
+                {#console.log($("#tel"));#}
+                let telregix = new RegExp("0?(13|14|15|18|17)[0-9]{9}");
+                if (!telregix.test(tel)) {
+                    $("#tel").next().text("手机号格式错误！")
+                    return false;
+                }
+            }else {
+                $("#tel").next().text("手机号不能为空！")
+                return false
+            }
+            if($("#password").val()){
+                if($("#password").val().length<6){
+                    $("#password").next().text("密码长度异常")
+                    return false
+                }
+            }else{
+                $("#password").next().text("密码不能为空")
+                return false
+            }
+            $.ajax({
+                url: '/third/zfb_bind',
+                method: 'POST',
+                data: $("#myform").serialize(),
+                dataType: 'json',
+                success: function (data) {
+                    alert(data.bind_msg);
+                    window.location.href="/"
+                }
+            })
+        })
+    })
+</script>
+{% endblock %}

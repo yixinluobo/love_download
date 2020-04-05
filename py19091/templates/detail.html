@@ -1,0 +1,217 @@
+{% extends 'template.html' %}
+{% block title %}资源详情{% endblock %}
+{% block main %}
+    <div id="main">
+
+        <!-- 定义详细目录-->
+        <div id="detail">
+			<!-- 资源上传者信息 -->
+			<div class="res_author">
+				<img src="{% url 'user:photo' msg.user_id %}"/>
+				<span>{{ msg.nickname }}</span><br/>
+				<a class="gz" href="javascript:void(0)" id="follow">关注</a>
+				<a href="javascript:void(0)">查看TA的更多资源</a>
+			</div>
+			<div class="res_det">
+				<!-- 资源信息 -->
+				<div class="title"> <!-- 主信息-->
+					<div class="img">
+						<img src="/static/images/{{ msg.re_suffix }}.svg" />
+					</div>
+					<div class="cons">
+						<div>
+							<label>{{ msg.re_name }}</label>
+						</div>
+						<div>
+							<label>{{ msg.upload_time|date:'Y-m-d' }}  上传大小：{{ msg.re_size|filesizeformat }}</label>
+							{% for i in msg.key_words.split %}
+                                <span>{{ i }}</span>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+				<div class="desc"> <!-- 信息描述-->
+					{{ msg.re_desc }}
+				</div>
+				<div class="msg" id="star_avg"> <!-- 评价信息-->
+					<span>★</span>
+					<span>★</span>
+					<span>★</span>
+					<span>★</span>
+					<span>★</span>
+				</div>
+				<div class="oper"> <!-- 下载操作-->
+					<span>所需积分：<b>{{ msg.re_point }}</b></span>
+					<span>下载次数：<b>{{ msg.download_num }}</b></span>
+					<span>
+						<a class="btn" href="/res/download/{{ msg.id }}">普通下载</a>
+                        <a class="btn" id="xunlei">迅雷下载</a>
+						<a class="btn" id="collection">收藏</a>
+					</span>
+				</div>
+			</div>
+
+        </div>
+        <div id="comment">
+            <div class="title">
+                评论：<span>共有<b>{{ comment_count.c_count }}</b>条</span>
+                <hr />
+            </div>
+
+            <!--每一条评论 -->
+            {% if comment_count.c_count == 0 %}
+                <p>暂无评论</p>
+            {% else %}
+            {% for comment in comment_msg %}
+            <div class="cons">
+                <div class="img">
+                    <img src="/user/photo/{{ comment.user_id }}" />
+                </div>
+                <div class="cmt">
+                    <div>
+                        <span class="author">{{ comment.nickname }}</span>
+                        <span class="timer">{{ comment.comment_time|date:"Y-m-d H:i:s" }}</span>
+                        <span class="star" id="pingxing">
+                            <span n="1">★</span>
+							<span n="2">★</span>
+							<span n="3">★</span>
+							<span n="4">★</span>
+							<span n="5">★</span>
+                            <span id="star_num" style="display:none;">{{ comment.star }}</span>
+                        </span>
+                    </div>
+
+                    <div class="msg">
+                        <dt>{{ comment.content }}</dt>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+
+        <!-- 开始评论-->
+        <div id="mycomments">
+            <div>
+                <span>我的评论</span>
+                <hr />
+
+                <textarea placeholder="可以留下您的宝贵意见哟"></textarea>
+                <div class="star"> <!-- 评价信息-->
+                    <span n="1" class="act">★</span>
+                    <span n="2">★</span>
+                    <span n="3">★</span>
+                    <span n="4">★</span>
+                    <span n="5">★</span>
+                </div>
+                <a id="commentBtn" class="btn">评论</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        {% if request.session.download_msg %}
+            alert({{ request.session.download_msg }});
+        {% endif %}
+
+        $(function () {
+            // 收藏
+            $("#collection").click(function () {
+               $.ajax({
+                   url: '/user/collection/{{ msg.id }}',
+                   method: 'POST',
+                   dataType: 'json',
+                   success: function (data) {
+                       window.alert(data.data)
+                   }
+               })
+            });
+            // 关注
+            $("#follow").click(function () {
+                $.ajax({
+                    url: '/user/follow/{{ msg.user_id }}',
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function (data) {
+                        alert(data.msg)
+                    }
+                })
+            });
+
+
+
+            // 资源详细信息评星
+            $("#star_avg span:lt({{ star_avg }})").addClass("act");
+
+            // 已有评论评星
+            let star_num = $("#star_num").text();
+            // console.log(star_num);
+            $("#pingxing span:lt("+star_num+")").addClass("act");
+            {#评论#}
+            $("#mycomments .star > span").click(function () {
+               $(this).addClass("act").prevAll().addClass("act");
+               $(this).nextAll().removeClass("act");
+               star = $(this).attr("n");
+            });
+
+            {#点击评论提交评论#}
+            $("#commentBtn").click(function () {
+                {#获取评论内容#}
+                var content = $(this).prevAll("textarea").val();
+                {#评论的内容不能少于5个字#}
+                if(content.length<5){
+                    alert("评论的内容不能少于5个字")
+                    return false;
+                }
+                {#发起异步请求，进行评论#}
+                $.ajax({
+                    url: "/res/comment/{{ msg.id }}",
+                    method: "POST",
+                    data: {"star": star, "content": content},
+                    dataType: "json",
+                    success: function (data) {
+                        var comment_html = `
+                            <div class="cons">
+                            <div class="img">
+                                <img src=""/>
+                            </div>
+                            <div class="cmt">
+                                <div>
+                                    <span class="author"></span>
+                                    <span class="timer"></span>
+                                    <span class="star">
+                                        <span>★</span>
+                                        <span>★</span>
+                                        <span>★</span>
+                                        <span>★</span>
+                                        <span>★</span>
+                                     </span>
+                                </div>
+                                <div class="msg">
+                                    <dt></dt>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                        // 把html格式字符串，转成Jquery对象，通过JQuery来操作DOM
+                        var comment_jq = $(comment_html);
+                        comment_jq.find("img").attr("src", "/user/photo/"+data.user_id);
+                        comment_jq.find(".author").text(data.nickname);
+                        comment_jq.find(".timer").text(data.comment_time.replace("T"," "));
+                        comment_jq.find(".star span:lt("+data.star+")").addClass("act");
+                        comment_jq.find(".msg dt").text(data.content);
+
+                        // jQuery 文档操作,将一段字符串写入到网页中
+                        $("#comment .title").after(comment_jq);
+
+                        var comment_num = $("#comment .title").find("b").text()
+                        comment_num = comment_num - -1;
+                        $("#comment .title").find("b").text(comment_num);
+                    }
+                })
+            })
+        })
+    </script>
+{% endblock %}

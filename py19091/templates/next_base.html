@@ -1,0 +1,113 @@
+{% extends 'template.html' %}
+{% block title %}基本信息{% endblock %}
+{% block main %}
+    <div class="reg">
+		<span>
+			<label class="btn"><input id="reg" type="button" form="myform" value="下一步"/></label>
+            <!--
+            <label>
+                <a href="./register3.html">跳过该步骤</a>
+            </label>
+            -->
+		</span>
+    </div>
+
+    <!-- 网站主体 -->
+    <div id="main">
+        <!-- 上传表单-->
+        <div class="upload reg2">
+            <!-- 显示图片-->
+            <div id="show_photo"></div>
+            <!-- 注册步骤导航-->
+            <div class="reg_step">
+                <a class="step1" href="/register">注册信息</a><a class="step" href="/next_base">基本信息</a><a class="step2"
+                                                                                                       href="/success">注册完成</a>
+            </div>
+            <hr/>
+
+
+            <form action="success/{{ user_id }}" id="myform" method="post" autocomplete="off" enctype="multipart/form-data">
+                <span>
+                    <label>用户头像：</label>
+                    <input class="upt" type="text" readonly="readonly"/>
+                    <input id="photo" class="upt" type="file" name="photo" value=""/>
+                    <b></b>
+                    <b>文件格式可以是jpg,gif,png等图片格式</b>
+                </span>
+                <span>
+                    <label>电子邮箱：</label>
+                    <input id="email" class="upt" type="text" name="email" value=""/>
+                    <b></b>
+                    <b>您丢失密码后找回密码的凭证</b>
+                </span>
+                <span>
+                    <label>出生日期：</label>
+                    <input id="tel" class="upt" type="date" name="birth" value=""/>
+                </span>
+
+                <span>
+                    <label>昵称：</label>
+                    <input id="nickname" class="upt" type="text" name="nickname" value=""/>
+                    <b></b>
+                </span>
+
+                <span>
+                    <label>真实姓名：</label>
+                    <input id="realname" class="upt" type="text" name="realname" value=""/>
+                    <b></b>
+                </span>
+
+                <span>
+                    <label>性别：</label>
+                    <select name="sex" class="upt">
+                        <option value="m">男</option>
+                        <option value="f">女</option>
+                    </select>
+                </span>
+
+
+            </form>
+        </div>
+
+    </div>
+{% endblock %}
+{#js代码#}
+{% block script %}
+    <script>
+        $(function () {
+            {#console.log($("#photo"))#}
+            $("#photo").change(function () {
+                let file = $("#photo")[0].files[0];
+                let name = file.name;
+                let size = file.size;
+                let type = file.type;
+                if (type != "image/jpeg" && type != "image/png" && type != "image/gif") {
+                    $("#photo").next().text("文件格式不正确")
+                    return false
+                }
+                $($(".upt")[0]).val(name);
+                let r = new FileReader();
+                r.readAsDataURL(file);
+                r.onload=function () {
+                    let img = "<img src='"+r.result+"'>";
+                    $("#show_photo").html(img);
+                };
+                $("#photo").next().text("");
+                return true
+            });
+            {#验证邮箱#}
+            $("#email").blur(function () {
+                let email_re = new RegExp("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
+                let email = $("#email").val();
+                if(!email_re.test(email)){
+                    $("#email").next().text("邮箱格式错误！");
+                    return false;
+                }
+                $("#email").next().text("");
+            });
+            $(".reg").click(function () {
+                $("#myform").submit();
+            })
+        })
+    </script>
+{% endblock %}

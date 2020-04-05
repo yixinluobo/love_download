@@ -1,0 +1,104 @@
+{% extends 'template.html' %}
+{% block title %}注册{% endblock %}
+{#主体#}
+{% block main %}
+    <div class="reg">
+        <span><label class="btn"><input id="reg" type="button" form="myform" value="下一步"/></label></span>
+    </div>
+
+    <!-- 网站主体 -->
+    <div id="main">
+        <!-- 上传表单-->
+        <div class="upload reg2">
+
+            <!-- 注册步骤导航-->
+            <div class="reg_step">
+                <a class="step" href="javascript:void(0)">注册信息</a><a class="step2" href="javascript:void(0)">基本信息</a><a class="step2"
+                                                                                                       href="javascript:void(0)">注册完成</a>
+            </div>
+            <hr/>
+
+            <form action="/next_base" autocomplete="off" id="myform" method="post">
+                <span>
+                    <input type="hidden" name="third_user_id" value="{{ third_user_id }}">
+                    <input type="hidden" name="third_type" value="{{ third_type }}">
+                </span>
+                <span>
+                    <label>手机号：</label>
+                    <input id="tel" class="upt" type="text" name="tel" value="{{ tel }}"/>
+					<b></b>
+                    <b>{{ msg }}</b>
+                </span>
+                <span>
+                    <label>密码：</label>
+                    <input id="password" class="upt" type="password" name="password" value=""/>
+                    <b></b>
+                    <b>密码长度为6-20位</b>
+                </span>
+                <span>
+                    <label>确认密码：</label>
+                    <input id="confirmPass" class="upt" type="password" value=""/>
+                    <b></b>
+                    <b>两次输入的密码必须保持一致</b>
+                </span>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{#js#}
+{% block script %}
+    <script>
+        $(function () {
+            $("#tel").blur(function () {
+                let tel = $("#tel").val();
+                {#console.log($("#tel"));#}
+                let telregix = new RegExp("0?(13|14|15|18|17)[0-9]{9}");
+                if (!telregix.test(tel)) {
+                    $("#tel").next().text("手机号格式错误！")
+                    return false;
+                } else {
+                    $("#tel").next().text("");
+                    $.ajax({
+                        url: '/check/' + tel,
+                        method: "GET",
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#tel").next().text(data.msg);
+                            $("#tel").data("check", data.status);
+                        }
+                    });
+                    if(!$("#tel").data("check")){
+                        return false;
+                    }
+                }
+            });
+
+            $("#password").blur(function () {
+                let pwd = $("#password").val();
+                if (pwd.length < 6 || pwd.length > 20) {
+                    $("#password").next().text("密码长度异常！")
+                    return false;
+                } else {
+                    $("#password").next().text("")
+                }
+            });
+
+            $("#confirmPass").blur(function () {
+                let pwd = $("#password").val();
+                let conpwd = $("#confirmPass").val();
+                if (conpwd != pwd) {
+                    $("#confirmPass").next().text("两次密码不一致！")
+                    return false;
+                } else {
+                    $("#confirmPass").next().text("")
+                }
+            });
+
+            {#提交表单#}
+            $(".reg").click(function () {
+                $("#myform").submit();
+            });
+        })
+    </script>
+{% endblock %}

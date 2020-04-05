@@ -1,0 +1,185 @@
+<!-- 聊天按钮 -->
+<aside id="chat">
+    <icon></icon>
+    <a href="javascript:void(0);">在线聊天</a>
+</aside>
+
+<!-- 聊天窗口-->
+<aside id="chat_win">
+    <div class="title">在线聊天，按ESC关闭窗口，按Enter提交信息</div>
+    <!-- 好友面板 -->
+    <div class="frily">
+{#        <!-- 一个好友 -->#}
+{#        <a href="javascript:void(0)" class="fly">#}
+{#            <div class='d1'>#}
+{#                <img class="chat_img" src='images/coms.jpg' />#}
+{#                <!-- 显示消息数量 -->#}
+{#                <div class="msg">99+</div>#}
+{#            </div>#}
+{#            <div class='d2'>#}
+{#                <span>藏三僧</span>#}
+{#            </div>#}
+{#        </a>#}
+{##}
+{#        <a href="javascript:void(0)" class="fly">#}
+{#            <div class='d1'>#}
+{#                <img class="chat_img" src='images/coms.jpg' />#}
+{#                <!-- 显示消息数量 -->#}
+{#                <div class="msg">64</div>#}
+{#            </div>#}
+{#            <div class='d2'>#}
+{#                <span>─╀0vЁ灬忽必烈</span>#}
+{#            </div>#}
+{#        </a>#}
+{##}
+{#        <a href="javascript:void(0)" class="fly">#}
+{#            <div class='d1'>#}
+{#                <img class="chat_img" src='images/coms.jpg' />#}
+{#                <!-- 显示消息数量,如果没有，则不显示 -->#}
+{#                <div class="msg zero">0</div>#}
+{#            </div>#}
+{#            <div class='d2'>#}
+{#                <span>─╀0vЁ灬忽必烈</span>#}
+{#            </div>#}
+{#        </a>#}
+{##}
+{#        <!-- 获取更多 -->#}
+        <a class="more" href="javascript:void(0)">加载更多</a>
+
+    </div>
+    <!-- 聊天面板 -->
+    <div class="chat_cs">
+        <!-- 聊天内容 -->
+        <div class="content">
+            <!-- 获取更多 -->
+            <a class="more" href="javascript:void(0)">加载更多</a>
+
+            <!--  发信息 -->
+            <div class="right">
+                <div class='d1'>
+                    <img class="chat_img" src='images/coms.jpg' />
+                </div>
+                <div class='d2'>
+                    <span>藏三僧</span><time>2019-10-16 08:58:34</time>
+                    <p>
+                        <span>你好,您的资源能够免费发我一份吗，我这边没有积分了，但是现在非常需要这份资源，如果方便的话，还请送我一份，好吗?</span>
+                    </p>
+                </div>
+            </div>
+
+            <!--  收信息 -->
+            <div class="left">
+                <div class='d1'>
+                    <img class="chat_img" src='images/user.jpg' />
+                </div>
+                <div class='d2'>
+                    <span>─╀0vЁ灬残夜</span><time>2019-10-16 08:58:34</time>
+                    <p>
+                        <span>不好意思啊，资料我自己没有进行存储</span>
+                    </p>
+                </div>
+            </div>
+            <!--  收信息 -->
+            <div class="left">
+                <div class='d1'>
+                    <img class="chat_img" src='images/user.jpg' />
+                </div>
+                <div class='d2'>
+                    <span>─╀0vЁ灬残夜</span><time>2019-10-16 08:58:34</time>
+                    <p>
+                        <span>不好意思啊，资料我自己没有进行存储</span>
+                    </p>
+                </div>
+            </div>
+            <!--  收信息 -->
+            <div class="left">
+                <div class='d1'>
+                    <img class="chat_img" src='images/user.jpg' />
+                </div>
+                <div class='d2'>
+                    <span>─╀0vЁ灬残夜</span><time>2019-10-16 08:58:34</time>
+                    <p>
+                        <span>不好意思啊，资料我自己没有进行存储</span>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+        <!-- 回复 -->
+        <div class="reply">
+            <textarea id="editer"></textarea>
+        </div>
+
+    </div>
+</aside>
+
+<script>
+		$(function(){
+
+		    // 调用好友接口
+            $.ajax({
+               url: '/friend',
+                dataType: 'json',
+                success: function(data){
+                    for(let i=0; i<data.length; i++){
+                        let friend = $("<a href=\"javascript:void(0)\" class=\"fly\">\n" +
+                            "            <div class='d1'>\n" +
+                            "                <img class=\"chat_img\" src='images/coms.jpg' />\n" +
+                            "                <!-- 显示消息数量 \n" +
+                            "                <div class=\"msg\">99+</div>\n -->" +
+                            "            </div>\n" +
+                            "            <div class='d2'>\n" +
+                            "                <span>藏三僧</span>\n" +
+                            "            </div>\n" +
+                            "        </a>")
+                        friend.find(".chat_img").attr("src","/user/photo/"+data[i].user_id);
+                        friend.find(".d2 span").text(data[i].realname)
+                        $(".frily").append(friend)
+                    }
+                }
+            });
+
+			$("#chat").on('click', function(){
+				var tag = $(this);
+				tag.hide();
+				$('#chat_win').show()
+				if(!tag.data('scroll')) {
+					vm = $(".content , .frily").mCustomScrollbar({
+						theme:"dark-thin",
+					});
+					// 初始化滚动条放到尾部
+					$(".content").mCustomScrollbar('scrollTo', 'bottom');
+					tag.data('scroll', true);
+				}
+
+			})
+
+			$(document).on('keydown', function(e){
+				if (e.keyCode==27){
+					$('#chat_win').hide()
+					$("#chat").show()
+				}
+			})
+
+			$("#editer").keydown(function(e){
+				if (e.keyCode ==13) {
+					msg = $(".chat_cs .right:first").clone()
+					msg.find("span:last").text($(this).val())
+					$(".content").append(msg)
+
+					// 清除 输入的内容
+					$(this).val('').focus()
+
+					//刷新滚动条
+					//$(".content").mCustomScrollbar('update')
+					$(".content").mCustomScrollbar('destroy')
+					$(".content").mCustomScrollbar({theme:"dark-thin"})
+					$(".content").mCustomScrollbar('scrollTo', 'bottom', {
+						scrollInertia:80
+					});
+
+				}
+			})
+		})
+
+	</script>

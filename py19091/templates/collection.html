@@ -1,0 +1,40 @@
+{% extends 'template.html' %}
+{% block title %}收藏{% endblock %}
+{% block main %}
+    <div id="main">
+        <!-- 定义一个条目-->
+        {% for coll in coll_list %}
+        <div class="pro">
+           <div class="img">
+               <img src="/static/images/{{ coll.re_suffix }}.svg" />
+           </div>
+            <div class="cs">
+                <div class="up">
+                    <a href="/res/detail/{{ coll.id }}">{{ coll.re_name }}</a>
+                </div>
+                <div class="down">
+                    上传者：{{ coll.nickname }}  收藏时间：{{ coll.coll_time|date:"Y-m-d H:i:s" }}
+                </div>
+            </div>
+            <div class="arr">
+                积分：<span>{{ coll.re_point }}</span>
+            </div>
+        </div>
+        {% endfor %}
+
+		<div class="panigation">
+            <a href="/user/collection">首页</a>
+            {% if coll_list.has_previous %}
+			<a href="/user/collection?page={{ coll_list.previous_page_number }}">&lt;上一页</a>
+            {% else %}
+            <a href="javascript:void(0)">&lt;上一页</a>
+            {% endif %}
+            {% if coll_list.has_next %}
+			<a href="/user/collection?page={{ coll_list.next_page_number }}">下一页&gt;</a>
+            {% else %}
+            <a href="javascript:void(0)">下一页&gt;</a>
+            {% endif %}
+            <a href="/user/collection?page={{ coll_list.end_index }}">尾页</a>
+		</div>
+    </div>
+{% endblock %}

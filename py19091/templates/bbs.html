@@ -1,0 +1,135 @@
+{% extends 'template.html' %}
+{% block title %}论坛{% endblock %}
+{#主体#}
+{% block main %}
+    <div id="main">
+        <div class="bbs">
+			<a class="btn" href="#tiezi">发帖</a>
+			<hr />
+
+            {% for tz in data %}
+			<div class="tz {% if tz.top == '1'%}top{% endif %}">
+				<div class="lf">
+                    {% if tz.top == "1" %}
+					<span>[置顶]</span>
+                    {% endif %}
+					<span>{{ tz.bbs_type }}</span>
+					<a href="/bbs/bbs_detail/{{ tz.pk }}">{{ tz.subject }}</a>
+				</div>
+				<div class="rf">
+					<div>
+						<span>{{ tz.user.info.nickname }}</span>
+						<span>{{ tz.create_time|date:"Y-m-d H:i:s" }}</span>
+					</div>
+					<div>
+						<span>lisi</span>
+						<span>2017-05-23 11:56:44</span>
+					</div>
+				</div>
+			</div>
+            {% endfor %}
+
+        <div class="panigation">
+            <a href="/bbs/index">首页</a>
+            {% if page_obj.has_previous %}
+                <a href="/bbs/index?page={{ page_obj.previous_page_number }}">&lt上一页</a>
+            {% else %}
+                <a href="javascript:void(0)">&lt上一页</a>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <a href="/bbs/index?page={{ page_obj.next_page_number }}">下一页&gt</a>
+            {% else %}
+                <a href="javascript:void(0)">下一页&gt</a>
+            {% endif %}
+            <a href="/bbs/index?page={{ page_obj.paginator.num_pages }}">尾页</a>
+        </div>
+
+			<a class="btn" href="#tiezi">发帖</a>
+			<hr />
+
+			<!-- 开始发帖-->
+			<!-- 上传表单-->
+			<div class="bbs_tz" id="tiezi">
+				<p>快速发帖</p>
+				<hr />
+				<form action="" method="post" id="myform">
+					<span>
+						<select name="bbs_type">
+							<option>技术专题</option>
+							<option>闲聊专题</option>
+						</select>
+						<input type="text" class="upt" name="subject" placeholder="请输入帖子标题"/>
+					</span>
+					<span>
+						<textarea id="editer" name="content" style="width:625px;height:205px;"></textarea> <!-- class="area"-->
+					</span>
+					<span><a class="btn">发表帖子</a></span>
+				</form>
+			</div>
+
+		</div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript" charset="utf-8" src="/static/js/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/static/js/ueditor.all.js"> </script>
+    <script>
+		$(function(){
+			var ue = UE.getEditor("editer");
+			$("#tiezi a.btn").click(function(){
+			    // 获取帖子标题
+                let subject = $("[name=subject]").val();
+                if(subject == null || subject == ""){
+                    return false;
+                }
+                // 获取帖子正文
+                let content = ue.getContentTxt();
+                if(content==null||content==""){
+                    return false;
+                }
+                // 异步请求发表帖子
+                $.ajax({
+                    url: "/bbs/tz",
+                    method: "POST",
+                    data: $("#myform").serialize(),
+                    dataType: "JSON",
+                    success: function (data) {
+                        var tz_html = `
+                            <div class="tz">
+                                <div class="lf">
+                                    <span></span>
+                                    <span></span>
+                                    <a href=""></a>
+                                </div>
+                                <div class="rf">
+                                    <div>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                    <div>
+                                        <span>lisi</span>
+                                        <span>2017-05-23 11:56:44</span>
+                                    </div>
+                                </div>
+                            </div>
+			                `;
+                    tz_jq = $(tz_html);
+                    tz_jq.find(".lf span:first").text("[置顶]");
+                    tz_jq.find(".lf span:eq(1)").text("["+data.bbs_type+"]");
+                    tz_jq.find(".lf a").attr("href", "/bbs/bbs_detail"+data.id);
+                    tz_jq.find(".lf a").text(data.subject);
+                    tz_jq.find(".rf div:first span:first").text(data.nickname);
+                    tz_jq.find(".rf div:first span:eq(1)").text(data.create_time);
+
+                    // $(".bbs hr:first").after(tz_jq)
+                    let tx = $(".bbs .top:last");
+                    if(tx.length == 0){
+                        tx = $(".bbs hr:first")
+                    }
+                    tx.after(tz_jq)
+                    }
+                })
+            })
+		})
+	</script>
+{% endblock %}

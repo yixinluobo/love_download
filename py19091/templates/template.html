@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/images">
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/js/common.js"></script>
+</head>
+<body>
+    {#导航#}
+    {% include 'nav.html' %}
+    {#登录弹出层#}
+    {% block login %}{% endblock %}
+    {#网站主体#}
+    {% block main %}{% endblock %}
+    {# 聊天 #}
+    {% include 'chat.html' %}
+    {#分页#}
+{#    {% include 'paging.html' %}#}
+    {#发表框#}
+    {% block publish %}{% endblock %}
+    {#JS代码#}
+    {% block script %}{% endblock %}
+</body>
+</html>

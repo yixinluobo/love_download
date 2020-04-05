@@ -1,0 +1,48 @@
+{% extends 'template.html' %}
+{% block title %}修改密码{% endblock %}
+{% block main %}
+    <div id="main">
+        <div class="upload">
+            <p>修改密码</p>
+            <hr/>
+            <form action="/user/modifypass" method="post" id="myform">
+				<span>
+					<label>旧密码：</label>
+					<input class="upt" type="password" name="oldpwd" value=""/>
+                    <b>{{ msg }}</b>
+				</span>
+                <span>
+					<label>新密码：</label>
+					<input class="upt" type="password" name="newpwd" value=""/>
+					<b>密码长度为6-20位</b>
+				</span>
+                <span>
+					<label>确认密码：</label>
+					<input class="upt" type="password" name="confirmpwd" value=""/>
+                    <b></b>
+					<b>两次输入的密码必须保持一致</b>
+				</span>
+
+                <span><label class="btn"><input id="mysubmit" type="button" value="确认修改"/></label></span>
+            </form>
+        </div>
+
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        $(function () {
+            $($(".upt")[2]).blur(function () {
+                let new_pwd = $($(".upt")[1]).val();
+                let confirm_pwd = $($(".upt")[2]).val();
+                if (new_pwd != confirm_pwd) {
+                    $($(".upt")[2]).next().text("密码不一致！")
+                    return false;
+                }
+                $("#mysubmit").click(function () {
+                $("#myform").submit()
+                })
+            })
+        })
+    </script>
+{% endblock %}

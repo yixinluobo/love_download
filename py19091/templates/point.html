@@ -1,0 +1,59 @@
+{% extends 'template.html' %}
+{% block title %}积分{% endblock %}
+{% block main %}
+    <div class="page_nav">
+        <p>当前积分：<span>{{ sum_point }}</span></p>
+    </div>
+
+        <!-- 上传表单-->
+	<div class="page_tb">
+		<table>
+			<thead>
+				<tr>
+					<th>序号</th>
+					<th>积分</th>
+					<th>时间</th>
+					<th>来源</th>
+				</tr>
+			</thead>
+			<tbody>
+            {% for point in point_info %}
+				<tr>
+					<td>{{ forloop.counter }}</td>
+					<td>{{ point.point }}</td>
+					<td>{{ point.ch_time|date:'Y-m-d H:i:s'}}</td>
+                    {% if point.source == 1 %}
+                        <td>用户注册</td>
+                    {% elif point.source == 2 %}
+                        <td>上传资源</td>
+                    {% elif point.source == 3 %}
+                        <td>资源评论</td>
+                    {% elif point.source == 4 %}
+                        <td>资源下载</td>
+                    {% elif point.source == 5 %}
+                        <td>发表帖子</td>
+                    {% else %}
+                        <td>资源被下载</td>
+                    {% endif %}
+
+				</tr>
+            {% endfor %}
+			</tbody>
+		</table>
+
+		<div class="panigation">
+            <a href="/user/point">首页</a>
+            {% if point_info.has_previous %}
+			    <a href="/user/point?page={{ point_info.previous_page_number }}">&lt;上一页</a>
+            {% else %}
+                <a href="javascript:void(0)">&lt;上一页</a>
+            {% endif %}
+            {% if point_info.has_next %}
+			    <a href="/user/point?page={{ point_info.next_page_number }}">下一页&gt;</a>
+            {% else %}
+                <a href="javascript:void(0)">下一页&gt;</a>
+            {% endif %}
+                <a href="/user/point?page={{ point_info.paginator.num_pages }}">尾页</a>
+		</div>
+	</div>
+{% endblock %}
