@@ -142,7 +142,7 @@ STATICFILES_DIRS = [
 EMAIL_HOST = "smtp.qq.com"
 EMAIL_PORT = 25
 EMAIL_HOST_USER = "jingsongxiansheng@qq.com"
-EMAIL_HOST_PASSWORD = "fxzwkcdmlktlbaeb"
+EMAIL_HOST_PASSWORD = "***********"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 CACHES = {
